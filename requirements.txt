@@ -1,0 +1,8 @@
+httpx
+fastapi
+numpy
+requests
+python-dotenv
+uvicorn
+duckdb
+uv

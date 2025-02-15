@@ -30,21 +30,6 @@ class TaskRouter:
             'A10': run_a10
         }
 
-    async def call_llm(self, prompt: str):
-        response = requests.post(
-            "https://aiproxy.sanand.workers.dev/openai/v1/chat/completions",
-            headers={
-                "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIzZHMxMDAwMDA1QGRzLnN0dWR5LmlpdG0uYWMuaW4ifQ.grlCTIxE_6nM1-sxRWMZOCooZ9Ndvrm7dlMjdr08Xug",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": "gpt-4o-mini",  # Replace with the correct model
-                "messages": [{"role": "user", "content": prompt}],
-            },
-        ).json()
-        
-        result = response["choices"][0]["message"]["content"].strip()
-        return result
     
     async def classify_task(self, task_description: str) -> Dict[str, Any]:
         """Use LLM to classify the task and extract parameters"""

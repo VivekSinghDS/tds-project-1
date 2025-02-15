@@ -2,6 +2,9 @@ def run_a8(input_path: str, output_path: str):
     import requests
     import base64
     import os
+    from dotenv import load_dotenv
+
+    load_dotenv()
     if os.environ.get('AUTH'):
         input_path = "." + input_path if input_path[0] != '.' else input_path
         output_path = "." + output_path if output_path[0] != '.' else output_path
@@ -20,10 +23,11 @@ def run_a8(input_path: str, output_path: str):
 
     # Getting the Base64 string
     base64_image = encode_image(input_path)
+    AIPROXY_TOKEN = os.environ.get('AIPROXY_TOKEN')
     response = requests.post(
         "https://aiproxy.sanand.workers.dev/openai/v1/chat/completions",
         headers={
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIzZHMxMDAwMDA1QGRzLnN0dWR5LmlpdG0uYWMuaW4ifQ.grlCTIxE_6nM1-sxRWMZOCooZ9Ndvrm7dlMjdr08Xug",
+            "Authorization": f"Bearer {AIPROXY_TOKEN}",
             "Content-Type": "application/json",
         },
         json={

@@ -190,15 +190,16 @@ async def a8(email, **kwargs):
 async def a9(email, **kwargs):
     data = get_comments(email)
     # print(data, ' <<< --- here')
+    AIPROXY_TOKEN = os.environ.get('AIPROXY_TOKEN')
+    print(AIPROXY_TOKEN, '  is the value')
     async with httpx.AsyncClient(timeout=30) as client:
-        print('inside')
         response = await client.post(
             f"https://aiproxy.sanand.workers.dev/openai/v1/embeddings",
-            headers={"Authorization": f"Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIzZHMxMDAwMDA1QGRzLnN0dWR5LmlpdG0uYWMuaW4ifQ.grlCTIxE_6nM1-sxRWMZOCooZ9Ndvrm7dlMjdr08Xug"},
+            headers={"Authorization": f"Bearer {AIPROXY_TOKEN}"},
             json={"model": "text-embedding-3-small", "input": data},
         )
 
-    print(response, ' hr')
+    # print(response.content, ' hr')
     embeddings = np.array([emb["embedding"] for emb in response.json()["data"]])
     similarity = np.dot(embeddings, embeddings.T)
     # Create mask to ignore diagonal (self-similarity)
@@ -235,8 +236,8 @@ async def a10(email, **kwargs):
 
 async def main(email: str):
     score, total = 0, 0
-    for task in [a1, a2, a3, a4, a5, a6, a7, a8, a9, a10]:
-    # for task in [a1,a3,a4,a5,a6,a7,a8,a9,a10]:
+    # for task in [a1, a2, a3, a4, a5, a6, a7, a8, a9, a10]:
+    for task in [a9]:
         total += 1
         try:
             success = await task(email=email)

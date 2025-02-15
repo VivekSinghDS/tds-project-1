@@ -3,11 +3,15 @@ from typing import Optional, List
 import requests 
 import numpy as np 
 import os
+from dotenv import load_dotenv 
+
+load_dotenv()
+AIPROXY_TOKEN = os.environ.get('AIPROXY_TOKEN')
 def get_embeddings(texts: List[str]):
 
     response =  requests.post(
             'https://aiproxy.sanand.workers.dev/openai/v1/embeddings',
-            headers={"Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIzZHMxMDAwMDA1QGRzLnN0dWR5LmlpdG0uYWMuaW4ifQ.grlCTIxE_6nM1-sxRWMZOCooZ9Ndvrm7dlMjdr08Xug"},
+            headers={"Authorization": f"Bearer {AIPROXY_TOKEN}"},
             json={"model": "text-embedding-3-small", "input": texts},
         )
     embeddings = np.array([emb["embedding"] for emb in response.json()["data"]])
@@ -41,12 +45,12 @@ def run_a9(input_file: str, output_file: str, no_of_similar_texts: str):
     # Find the most similar pair (excluding self-similarity)
     np.fill_diagonal(similarity_matrix, -1)  # Ignore self-similarity
     most_similar_indices = np.unravel_index(np.argmax(similarity_matrix), similarity_matrix.shape)
-    print(most_similar_indices, ' is this one')
+    # print(most_similar_indices, ' is this one')
     # Get the most n similar texts
     similar_texts = []
     for i in range(no_of_similar_texts * 2):
         similar_texts.append(documents[most_similar_indices[i]])
-    print(similar_texts, ' is the similar texts')
+    # print(similar_texts, ' is the similar texts')
     # Write the them to the output file
     with open(output_file, "w") as file:
         for text in similar_texts:

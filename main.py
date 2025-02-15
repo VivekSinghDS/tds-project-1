@@ -44,7 +44,7 @@ app.add_middleware(
 def save_to_file(input_path: str, content: str):
     with open(input_path, 'w') as file:
         file.write(content)
-
+AIPROXY_TOKEN = os.environ.get('AIPROXY_TOKEN')
 FUNCTION_SCHEMAS = [    
     {
         "type": "function",
@@ -339,7 +339,7 @@ async def query_gpt(user_input: str, tools: list) -> dict:
     response = requests.post(
         "https://aiproxy.sanand.workers.dev/openai/v1/chat/completions",
         headers={
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIzZHMxMDAwMDA1QGRzLnN0dWR5LmlpdG0uYWMuaW4ifQ.grlCTIxE_6nM1-sxRWMZOCooZ9Ndvrm7dlMjdr08Xug",
+            "Authorization": f"Bearer {AIPROXY_TOKEN}",
             "Content-Type": "application/json",
         },
         json={

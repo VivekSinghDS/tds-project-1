@@ -1,6 +1,6 @@
 import subprocess
 import os 
-def run_a2(input_path: str):
+def run_a2(input_path: str, package: str, version: str):
     try:
         if os.environ.get('AUTH'):
             input_path = "." + input_path if input_path[0] != '.' else input_path
@@ -13,10 +13,10 @@ def run_a2(input_path: str):
             raise PermissionError(f"Access outside /data/ is not allowed: {input_path}")
 
         
-        subprocess.run(["npm", "install", "-g", "prettier@3.4.2"], check=True)
+        subprocess.run(["npm", "install", "-g", f"{package}@{version}"], check=True)
 
         # Run prettier to format the file in-place
-        subprocess.run(["prettier", "--write", input_path], check=True)
+        subprocess.run([f"{package}", "--write", input_path], check=True)
 
         print(f"Formatted {input_path} successfully.")
     except subprocess.CalledProcessError as e:

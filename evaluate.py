@@ -68,7 +68,7 @@ with `{email}` as the only argument
 
 async def a2(email: str, file: str = "/data/format.md", **kwargs):
     original = get_markdown(email)
-    print('npx prettier@3.4.2 --stdin-filepath /data/format.md')
+    # print('npx prettier@3.4.2 --stdin-filepath /data/format.md')
     expected = subprocess.run(
         ["npx", "prettier@3.4.2", "--stdin-filepath", file],
         input=original,
@@ -78,6 +78,7 @@ async def a2(email: str, file: str = "/data/format.md", **kwargs):
         # # Ensure npx is picked up from the PATH on Windows
         shell=True,
     ).stdout
+    print('expected output ', expected)
     print('did i reach here')
     result = await run(
         f"""
@@ -236,8 +237,8 @@ async def a10(email, **kwargs):
 
 async def main(email: str):
     score, total = 0, 0
-    # for task in [a1, a2, a3, a4, a5, a6, a7, a8, a9, a10]:
-    for task in [a9]:
+    for task in [a1, a2, a3, a4, a5, a6, a7, a8, a9, a10]:
+    # for task in [a2]:
         total += 1
         try:
             success = await task(email=email)

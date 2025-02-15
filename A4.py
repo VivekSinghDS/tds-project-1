@@ -1,6 +1,8 @@
-def run_a4(input_path, output_path):
+def run_a4(input_path, output_path, keys):
     import json
     import os
+    import ast
+    keys = ast.literal_eval(keys)
     if os.environ.get('AUTH'):
         input_path = "." + input_path if input_path[0] != '.' else input_path
 
@@ -16,10 +18,9 @@ def run_a4(input_path, output_path):
     # Read the JSON data
     with open(input_path, "r") as f:
         contacts = json.load(f)
-
+    print(keys)
     # Sort contacts by last_name, then first_name
-    sorted_contacts = sorted(contacts, key=lambda c: (c["last_name"], c["first_name"]))
-
+    sorted_contacts = sorted(contacts, key=lambda c: tuple(c[key] for key in keys))
     # Write sorted data to output file
     with open(output_path, "w") as f:
         json.dump(sorted_contacts, f, indent=2)

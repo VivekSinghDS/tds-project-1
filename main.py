@@ -1,12 +1,7 @@
-import re
-from typing import Dict, Any, Optional
-from pathlib import Path
 import json 
 import requests
 import os
-import httpx
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 
@@ -24,6 +19,7 @@ from A10 import run_a10
 
 from b2 import run_b2
 from b3 import run_b3
+from b7 import run_b7_1
 from dotenv import load_dotenv 
 import sqlite3
 import duckdb 
@@ -80,9 +76,17 @@ FUNCTION_SCHEMAS = [
                     "input_path": {
                         "type": "string",
                         "description": "Input file path to be updated"
+                    },
+                    "package": {
+                        "type": "string",
+                        "description": "name of the packae"
+                    },
+                    "version": {
+                        "type": "string",
+                        "description": "Version of the package"
                     }
                 },
-                "required": ["input_path"],
+                "required": ["input_path", "package", "version"],
                 "additionalProperties": False,
             },
             "strict": True,
@@ -131,9 +135,13 @@ FUNCTION_SCHEMAS = [
                     "output_path": {
                         "type": "string",
                         "description": "Output file path where the sorted contacts should be written"
+                    },
+                    "keys": {
+                        "type": "string",
+                        "description": "required format: python list of keys that should be sorted"
                     }
                 },
-                "required": ["input_path", "output_path"],
+                "required": ["input_path", "output_path", "keys"],
                 "additionalProperties": False
             },
             "strict": True
@@ -297,12 +305,20 @@ FUNCTION_SCHEMAS = [
                         "type": "string",
                         "description": "url to be scraped"
                     },
+                    "output_path": {
+                        "type": "string",
+                        "description": "path where the output needs to be saved"
+                    },
                     "params": {
                         "type": "object",
-                        "description": "parameters for the request"
+                        "description": "query parameters for the request body"
+                    },
+                    "headers": {
+                        "type": "object",
+                        "description": "headers for the request"
                     }
                 },
-                "required": ['url'],
+                "required": ['url', 'output_path', 'headers', 'params'],
                 "additionalProperties": False
             },
             "strict": False
@@ -311,21 +327,48 @@ FUNCTION_SCHEMAS = [
     {
         "type": "function",
         "function": {
-            "name": "save_to_file",
-            "description": "Save contents to a file",
+            "name": "run_b7_1",
+            "description": "function that will compress or resize an image",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "input_path": {
+                    "source": {
                         "type": "string",
-                        "description": "input file path to be saved"
+                        "description": "input file path or the url of an image"
                     },
-                    "content": {
+                    "output_path": {
                         "type": "string",
-                        "description": "content that needs to be saved"
-                    }
+                        "description": "path where the file should be saved"
+                    },
+                    "width": {
+                        "type": "number",
+                        "description": "width to which the image needs to be compressed, 300 if not given anything"
+                    },
+                    "height": {
+                        "type": "number",
+                        "description": "height to which the image needs to be compressed, 300 if not given anything"
+                    },
                 },
-                "required": ['input_path', 'content'],
+                "required": ['source', 'output_path', 'width', 'height'],
+                "additionalProperties": False
+            },
+            "strict": True
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "run_b2",
+            "description": "Delete a particular file or directory",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "input file path or directory path"
+                    },
+                },
+                "required": ['path'],
                 "additionalProperties": False
             },
             "strict": True

@@ -1,4 +1,3 @@
-httpx
 fastapi
 numpy
 requests
@@ -6,3 +5,5 @@ python-dotenv
 uvicorn
 duckdb
 uv
+Pillow
+scikit-learn

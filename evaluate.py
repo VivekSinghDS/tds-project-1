@@ -238,7 +238,7 @@ async def a10(email, **kwargs):
 async def main(email: str):
     score, total = 0, 0
     for task in [a1, a2, a3, a4, a5, a6, a7, a8, a9, a10]:
-    # for task in [a2]:
+    # for task in [a9]:
         total += 1
         try:
             success = await task(email=email)

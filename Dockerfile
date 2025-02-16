@@ -14,6 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get install -y nodejs
 # Switch to root user to avoid permission issues
+RUN pip install pandas
 USER root
 
 # Ensure /data is writable

@@ -19,7 +19,9 @@ from A10 import run_a10
 
 from b2 import run_b2
 from b3 import run_b3
+from b5 import run_b5
 from b7 import run_b7_1
+from b9 import run_b9
 from dotenv import load_dotenv 
 import sqlite3
 import duckdb 
@@ -297,7 +299,7 @@ FUNCTION_SCHEMAS = [
         "type": "function",
         "function": {
             "name": "run_b3",
-            "description": "Scrape contents for a website",
+            "description": "Scrape the given api link and store the contents",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -328,7 +330,7 @@ FUNCTION_SCHEMAS = [
         "type": "function",
         "function": {
             "name": "run_b7_1",
-            "description": "function that will compress or resize an image",
+            "description": "given an image url or local file, this function will compress or resize an image",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -373,6 +375,60 @@ FUNCTION_SCHEMAS = [
             },
             "strict": True
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "run_b9",
+            "description": "Given a url or a local file path, this function will convert the present markdown to html",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "input_path": {
+                        "type": "string",
+                        "description": "input file path or url from where the contents need to be fetched"
+                    },
+                    "output_path": {
+                        "type": "string",
+                        "description": "path to save the converted file"
+                    },
+                },
+                "required": ['input_path', 'output_path'],
+                "additionalProperties": False
+            },
+            "strict": True
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "run_b5",
+            "description": "This function will take in a sql or duckdb query, execute it and format the result in the output file",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "The query to be executed, it can be an input file path from where the query is present or the query itself"
+                    },
+                    "db_type": {
+                        "type": "string",
+                        "description": "Must be one of sqlite or duckdb, if something else is provided then pass the value as `other`"
+                    },
+                    "db_path": {
+                        "type": "string",
+                        "description": "Path to where the database is present, if nothing is given then take as `sample.db`"
+                    },
+                    "output_path": {
+                        "type": "string",
+                        "description": "Path to where the output should be saved, if nothing is given set as `output.csv`"
+                    },
+                },
+                "required": ['query', 'db_type', 'db_path', 'output_path'],
+                "additionalProperties": False
+            },
+            "strict": True
+        }
     }
 
 ]
@@ -410,7 +466,7 @@ async def execute_query(task: str):
             result = globals()[function_name](**arguments)
             return {"name": function_name, "arguments": arguments}
     except PermissionError as e:
-        raise HTTPException(status_code=403, detail=str(e))
+        return HTTPException(status_code=400, detail=str(e))
     
 @app.get("/read")
 def read_file(path: str):
@@ -425,4 +481,4 @@ def read_file(path: str):
             content = f.read()
         return PlainTextResponse(content)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return HTTPException(status_code=500, detail=str(e))

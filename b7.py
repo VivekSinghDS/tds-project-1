@@ -13,7 +13,9 @@ def run_b7_1(source: str, output_path: str, width: int, height: int):
     :return: Resized PIL Image object.
     """
     try:
-        
+        def is_allowed_path(file_path: str) -> bool:
+            abs_path = os.path.abspath(file_path)
+            return abs_path.startswith("/data/")
         # Load image from URL, file, or base64 string
         if source.startswith("http"):  # Check if source is a URL
             response = requests.get(source)
@@ -23,14 +25,17 @@ def run_b7_1(source: str, output_path: str, width: int, height: int):
             base64_data = source.split(",", 1)[1]  # Remove the header
             img = Image.open(BytesIO(base64.b64decode(base64_data)))
         else:
-            img = Image.open(source)  # Assume it's a local file
+            if is_allowed_path(source):
+                img = Image.open(source)  # Assume it's a local file
+            else:
+                raise PermissionError(f"Access outside /data/ is not allowed: {source}")
         
         # Resize image
         img_resized = img.resize((width, height), Image.ANTIALIAS)
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
-
-        # Save the resized image
-        img_resized.save(output_path)
+        if is_allowed_path(output_path):
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            # Save the resized image
+            img_resized.save(output_path)
 
         return 'done'
     except Exception as e:
